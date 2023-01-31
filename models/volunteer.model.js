@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const memberSchema = new Schema({
+const volunteerSchema = new Schema({
   firstName: {
     type: String,
     required: true,
@@ -17,7 +17,7 @@ const memberSchema = new Schema({
     type: String,
   },
   postalCode: {
-    type: String,
+    type: string,
   },
   phoneNumber: {
     type: String,
@@ -31,21 +31,22 @@ const memberSchema = new Schema({
     ref: "User",
     unique: true,
   },
-  // Member only fields
-  birthDate: {
-    type: Date,
-    required: true,
+  // Volunteer only fields
+  isActive: {
+    type: Boolean,
+    default: false,
   },
-  mealPreference: {
-    type: String,
-    required: true,
-  },
-  meals: [
+  workAssigned: [
     {
-      type: Schema.Types.ObjectId,
-      ref: "Meal",
+      work: {
+        type: Schema.Types.ObjectId,
+        ref: "VolunteerWork",
+      },
+      status: {
+        type: String,
+      },
     },
   ],
 });
 
-module.exports = mongoose.model("Member", memberSchema);
+module.exports = mongoose.model("Volunteer", volunteerSchema);
