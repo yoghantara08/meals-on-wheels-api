@@ -7,10 +7,6 @@ const partnerSchema = new Schema({
     required: true,
     unique: true,
   },
-  password: {
-    type: String,
-    required: true,
-  },
   companyName: {
     type: String,
     required: true,
