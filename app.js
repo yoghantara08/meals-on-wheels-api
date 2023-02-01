@@ -18,6 +18,7 @@ mongoose
     "mongodb+srv://merrymeals08:merrymeals123@cluster0.tuljkwh.mongodb.net/merrymeals?retryWrites=true&w=majority"
   )
   .then((res) => {
+    console.log("Connected");
     app.listen(8080);
   })
   .catch((err) => console.log(err));
