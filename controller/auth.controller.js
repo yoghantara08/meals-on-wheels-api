@@ -8,6 +8,7 @@ const Caregiver = require("../models/caregiver.model");
 const Rider = require("../models/rider.model");
 
 const validate = require("../validation/validator");
+const Role = require("../utils/role");
 
 /**
  * @param {express.Request} req
@@ -15,11 +16,23 @@ const validate = require("../validation/validator");
  * @param {express.NextFunction} next
  */
 exports.register = async (req, res, next) => {
+  // GENERAL VALIDATION
   validate(req);
-  // body
+
+  // BODY
   const email = req.body.email;
   const password = req.body.password;
   const role = req.body.role;
+
+  // GENERAL DATA
+  const generalData = {
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+    address: req.body.address,
+    city: req.body.city,
+    postalCode: req.body.postalCode,
+    phoneNumber: req.body.phoneNumber,
+  };
 
   try {
     // Register User Account
@@ -33,7 +46,13 @@ exports.register = async (req, res, next) => {
 
     const account = await user.save();
 
-    // Register Member
+    // CHECK ROLE FOR REGISTER
+    if (role === Role.Member) {
+      const member = await memberRegis(account._id, req, generalData);
+      res
+        .status(201)
+        .json({ message: "New member account created!", member: member });
+    }
   } catch (error) {
     if (!error.statusCode) {
       error.statusCode = 500;
@@ -42,4 +61,17 @@ exports.register = async (req, res, next) => {
   }
 };
 
-const memberRegis = (userId) => {};
+// MEMBER REGISTER
+const memberRegis = async (userId, req, generalData) => {
+  const birthDate = req.body.birthDate;
+  const mealPreference = req.body.mealPreference;
+
+  const member = new Member({
+    ...generalData,
+    birthDate: new Date(birthDate),
+    mealPreference: mealPreference,
+    userId: userId,
+  });
+
+  return member.save();
+};

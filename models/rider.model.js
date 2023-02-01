@@ -17,7 +17,7 @@ const riderSchema = new Schema({
     type: String,
   },
   postalCode: {
-    type: string,
+    type: String,
   },
   phoneNumber: {
     type: String,
