@@ -1,11 +1,9 @@
+const express = require("express");
 const bcrypt = require("bcryptjs");
 const { validationResult } = require("express-validator");
 
 const User = require("../models/users.model");
-const Member = require("../models/member.model");
-const Caregiver = require("../models/caregiver.model");
-const Rider = require("../models/rider.model");
-
+const Partner = require("../models/partner.model");
 const Role = require("../utils/role");
 
 exports.register = async (req, res, next) => {
@@ -15,20 +13,16 @@ exports.register = async (req, res, next) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  // Request BODY from frontend
+  // REQUEST BODY
   const email = req.body.email;
   const password = req.body.password;
   const role = req.body.role;
-
-  // Data that exist in every user
-  const generalData = {
-    firstName: req.body.firstName,
-    lastName: req.body.lastName,
-    address: req.body.address,
-    city: req.body.city,
-    postalCode: req.body.postalCode,
-    phoneNumber: req.body.phoneNumber,
-  };
+  const firstName = req.body.firstName;
+  const lastName = req.body.lastName;
+  const age = req.body.age;
+  const address = req.body.address;
+  const phoneNumber = req.body.phoneNumber;
+  const imageUrl = req.file.path.replace("\\", "/");
 
   try {
     // HASH PASSWORD
@@ -39,95 +33,77 @@ exports.register = async (req, res, next) => {
       email: email,
       password: hashedPw,
       role: role,
+      firstName: firstName,
+      lastName: lastName,
+      age: age,
+      address: address,
+      phoneNumber: phoneNumber,
+      imageUrl: imageUrl,
+      accountStatus: "PENDING",
     });
 
-    // CHECK ROLE FOR REGISTER
-    if (role === Role.Member) {
-      // Member
-      const member = await memberRegis(req, user, generalData);
-      res
-        .status(201)
-        .json({ message: "New member account created!", member: member });
-    } else if (role === Role.Caregiver) {
-      // Caregiver
-      const caregiver = await caregiverRegis(req, user, generalData);
-      res.status(201).json({
-        message:
-          "Caregiver registration complete! Need Admin permission to activate account!",
-        caregiver: caregiver,
+    const validRole =
+      role === Role.Member || role === Role.Rider || role === Role.Volunteer;
+    if (validRole) {
+      // Member no need permission to create an account
+      if (role === Role.Member) {
+        user.accountStatus = "ACTIVE";
+      }
+
+      const newUser = await user.save();
+      return res.status(201).json({
+        message: `User with role ${newUser.role} is created!`,
+        data: { email: newUser.email, role: newUser.role },
       });
-    } else if (role === Role.Rider) {
-      // Rider
-      const rider = await riderRegis(req, user, generalData);
-      res.status(201).json({
-        message:
-          "Rider registration complete! Need Admin permission to activate account!",
-        rider: rider,
-      });
+    } else {
+      return res.status(400).json({ message: "Invalid role user" });
     }
   } catch (error) {
-    // Catch server error
-    if (!error.statusCode) {
-      error.statusCode = 500;
-    }
-    next(error);
+    return res
+      .status(500)
+      .json({ error: error, message: "Internal server error" });
   }
 };
 
-// MEMBER REGISTER
-const memberRegis = async (req, user, generalData) => {
-  const { birthDate, mealPreference } = req.body;
-
-  const member = new Member({
-    ...generalData,
-    userId: user._id,
-    birthDate: new Date(birthDate),
-    mealPreference: mealPreference,
-  });
-
-  const newMember = await member.save();
-
-  if (newMember) {
-    user.save();
+exports.regisPartner = async (req, res, next) => {
+  // Catch errors from validation before saving data to database
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
   }
 
-  return newMember;
-};
+  // REQUEST BODY
+  const email = req.body.email;
+  const password = req.body.password;
+  const companyName = req.body.companyName;
+  const address = req.body.address;
+  const phoneNumber = req.body.phoneNumber;
+  const imageUrl = req.file.path.replace("\\", "/");
 
-// CAREGIVER REGISTER
-const caregiverRegis = async (req, user, generalData) => {
-  const { isActive } = req.body;
+  try {
+    // Hash Password
+    const hashedPw = await bcrypt.hash(password, 12);
 
-  const caregiver = new Caregiver({
-    ...generalData,
-    userId: user._id,
-    isActive: isActive,
-  });
+    // CREATE NEW PARTNER
+    const partner = new Partner({
+      email: email,
+      password: hashedPw,
+      companyName: companyName,
+      address: address,
+      phoneNumber: phoneNumber,
+      imageUrl: imageUrl,
+      role: Role.Partner,
+      accountStatus: "PENDING",
+    });
 
-  const newCaregiver = await caregiver.save();
-
-  if (newCaregiver) {
-    user.save();
+    const newPartner = await partner.save();
+    return res.status(201).json({
+      message: "Partner registered successfully!",
+      data: { email: newPartner.email, companyName: newPartner.companyName },
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ error: error, message: "Internal server error" });
   }
-
-  return newCaregiver;
-};
-
-// RIDER REGISTER
-const riderRegis = async (req, user, generalData) => {
-  const { isActive } = req.body;
-
-  const rider = new Rider({
-    ...generalData,
-    userId: user._id,
-    isActive: isActive,
-  });
-
-  const newRider = await rider.save();
-
-  if (newRider) {
-    user.save();
-  }
-
-  return newRider;
 };

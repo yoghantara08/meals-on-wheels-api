@@ -1,21 +1,21 @@
-const { check } = require("express-validator");
+const { check, body } = require("express-validator");
 
 const User = require("../models/users.model");
 const Partner = require("../models/partner.model");
 const Role = require("../utils/role");
 
-const registerValidation = [
+const partnerValidation = [
   // Email
-  check("email")
+  body("email")
     .isEmail()
     .withMessage("Please enter valid email")
     .custom(async (value) => {
-      const user = await User.findOne({ email: value });
-      if (user) {
-        return Promise.reject("Email has already taken!");
-      }
       const partner = await Partner.findOne({ email: value });
       if (partner) {
+        return Promise.reject("Email has already taken!");
+      }
+      const user = await User.findOne({ email: value });
+      if (user) {
         return Promise.reject("Email has already taken!");
       }
     })
@@ -29,21 +29,15 @@ const registerValidation = [
 
   // Role
   check("role")
-    .isIn([Role.Member, Role.Caregiver, Role.Rider, Role.Volunteer])
-    .withMessage(
-      `Invalid role! Only ${Role.Member}, ${Role.Rider}, and ${Role.Volunteer} Exists!`
-    ),
+    .not()
+    .equals(Role.Partner)
+    .withMessage(`Invalid role for Partnership!`),
 
-  // Firstname
-  check("firstName").trim().notEmpty().withMessage("First name is required!"),
-
-  // Age
-  check("age")
+  // Company name
+  check("companyName")
     .trim()
     .notEmpty()
-    .withMessage("Age is required!")
-    .isNumeric()
-    .withMessage("Age must be a number!"),
+    .withMessage("Company name is required!"),
 
   // Address
   check("address").trim().notEmpty().withMessage("Address is required!"),
@@ -55,4 +49,4 @@ const registerValidation = [
     .withMessage("Phone number is required!"),
 ];
 
-module.exports = registerValidation;
+module.exports = partnerValidation;

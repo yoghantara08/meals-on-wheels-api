@@ -7,6 +7,13 @@ const partnerSchema = new Schema({
     required: true,
     unique: true,
   },
+  password: {
+    type: String,
+    required: true,
+  },
+  role: {
+    type: String,
+  },
   companyName: {
     type: String,
     required: true,
@@ -15,9 +22,6 @@ const partnerSchema = new Schema({
     type: String,
     required: true,
   },
-  city: {
-    type: String,
-  },
   phoneNumber: {
     type: String,
     required: true,
@@ -25,16 +29,9 @@ const partnerSchema = new Schema({
   imageUrl: {
     type: String,
   },
-  kitchen: [
-    {
-      name: {
-        type: String,
-      },
-      location: {
-        type: String,
-      },
-    },
-  ],
+  accountStatus: {
+    type: String,
+  },
 });
 
 module.exports = mongoose.model("Partner", partnerSchema);
