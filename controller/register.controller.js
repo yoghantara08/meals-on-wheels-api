@@ -20,17 +20,14 @@ exports.register = async (req, res, next) => {
   }
 
   // REQUEST BODY
-  const {
-    email,
-    password,
-    role,
-    firstName,
-    lastName,
-    age,
-    address,
-    phoneNumber,
-  } = req.body;
-
+  const email = req.body.email;
+  const password = req.body.password;
+  const role = req.body.role;
+  const firstName = req.body.firstName;
+  const lastName = req.body.lastName;
+  const age = req.body.age;
+  const address = req.body.address;
+  const phoneNumber = req.body.phoneNumber;
   const imageUrl = req.file.path.replace("\\", "/");
 
   try {

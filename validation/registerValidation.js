@@ -1,5 +1,7 @@
 const { check } = require("express-validator");
+
 const User = require("../models/users.model");
+const Partner = require("../models/partner.model");
 const Role = require("../utils/role");
 
 const registerValidation = [
@@ -8,10 +10,15 @@ const registerValidation = [
     .isEmail()
     .withMessage("Please enter valid email")
     .custom((value) => {
-      return User.findOne({ email: value }).then((userDoc) => {
-        if (userDoc) {
+      return User.findOne({ email: value }).then((user) => {
+        if (user) {
           return Promise.reject("Email has already taken!");
         }
+        Partner.findOne({ email: value }).then((partner) => {
+          if (partner) {
+            return Promise.reject("Email has already taken!");
+          }
+        });
       });
     })
     .normalizeEmail(),
