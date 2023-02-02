@@ -6,7 +6,16 @@ const cors = require("cors");
 const fs = require("fs");
 require("dotenv").config();
 
+const adminRoutes = require("./routes/admin.routes");
 const authRoutes = require("./routes/auth.routes");
+const donationRoutes = require("./routes/donation.routes");
+const mealRoutes = require("./routes/meal.routes");
+const memberRoutes = require("./routes/member.routes");
+const partnerRoutes = require("./routes/partner.routes");
+const profileRoutes = require("./routes/profile.routes");
+const riderRoutes = require("./routes/rider.routes");
+const volunteerRoutes = require("./routes/volunteer.routes");
+
 const upload = require("./utils/upload-image");
 
 // Initialize App
@@ -34,7 +43,15 @@ if (!fs.existsSync(dir)) {
 }
 
 // Routes
-app.use("/auth", authRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/donation", donationRoutes);
+app.use("/api/meals", mealRoutes);
+app.use("/api/member", memberRoutes);
+app.use("/api/partner", partnerRoutes);
+app.use("/api/profile", profileRoutes);
+app.use("/api/rider", riderRoutes);
+app.use("/api/volunteer", volunteerRoutes);
 
 mongoose.set("strictQuery", true);
 mongoose

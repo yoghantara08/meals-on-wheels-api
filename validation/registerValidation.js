@@ -9,17 +9,15 @@ const registerValidation = [
   check("email")
     .isEmail()
     .withMessage("Please enter valid email")
-    .custom((value) => {
-      return User.findOne({ email: value }).then((user) => {
-        if (user) {
-          return Promise.reject("Email has already taken!");
-        }
-        Partner.findOne({ email: value }).then((partner) => {
-          if (partner) {
-            return Promise.reject("Email has already taken!");
-          }
-        });
-      });
+    .custom(async (value) => {
+      const user = await User.findOne({ email: value });
+      if (user) {
+        return Promise.reject("Email has already taken!");
+      }
+      const partner = await Partner.findOne({ email: value });
+      if (partner) {
+        return Promise.reject("Email has already taken!");
+      }
     })
     .normalizeEmail(),
 

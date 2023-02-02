@@ -1,25 +1,23 @@
-const { check } = require("express-validator");
+const { check, body } = require("express-validator");
 
 const User = require("../models/users.model");
 const Partner = require("../models/partner.model");
 const Role = require("../utils/role");
 
-const partnershipValidation = [
+const partnerValidation = [
   // Email
-  check("email")
+  body("email")
     .isEmail()
     .withMessage("Please enter valid email")
-    .custom((value) => {
-      return User.findOne({ email: value }).then((user) => {
-        if (user) {
-          return Promise.reject("Email has already taken!");
-        }
-        Partner.findOne({ email: value }).then((partner) => {
-          if (partner) {
-            return Promise.reject("Email has already taken!");
-          }
-        });
-      });
+    .custom(async (value) => {
+      const partner = await Partner.findOne({ email: value });
+      if (partner) {
+        return Promise.reject("Email has already taken!");
+      }
+      const user = await User.findOne({ email: value });
+      if (user) {
+        return Promise.reject("Email has already taken!");
+      }
     })
     .normalizeEmail(),
 
@@ -51,4 +49,4 @@ const partnershipValidation = [
     .withMessage("Phone number is required!"),
 ];
 
-module.exports = partnershipValidation;
+module.exports = partnerValidation;

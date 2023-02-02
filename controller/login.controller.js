@@ -31,18 +31,22 @@ exports.login = async (req, res, next) => {
       isCorrectPw = await bcrypt.compare(password, partner.password);
     }
 
+    // Check if user not found
     if (!loadedUser) {
       return res.status(401).json({ message: "User can't be found!" });
     }
 
+    // Check if password is incorrect
     if (!isCorrectPw) {
       return res.status(401).json({ message: "Wrong password!" });
     }
 
+    // Generate JWT for login
     const token = await jwt.sign(
       {
         email: loadedUser.email,
         userId: loadedUser._id.toString(),
+        role: loadedUser.role,
       },
       process.env.JWT_SECRET,
       { expiresIn: "1d" }
@@ -52,7 +56,6 @@ exports.login = async (req, res, next) => {
       .status(200)
       .json({ token: token, userId: loadedUser._id.toString() });
   } catch (error) {
-    console.log(error);
     return res
       .status(500)
       .json({ error: error, message: "Internal server error" });
