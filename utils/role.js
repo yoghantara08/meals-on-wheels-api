@@ -3,4 +3,5 @@ module.exports = {
   Member: "MEMBER",
   Rider: "RIDER",
   Volunteer: "VOLUNTEER",
+  Partner: "PARTNER",
 };
