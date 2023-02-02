@@ -56,10 +56,10 @@ exports.register = async (req, res, next) => {
         user.accountStatus = "ACTIVE";
       }
 
-      user.save();
+      const newUser = await user.save();
       return res.status(201).json({
-        message: `User with role ${user.role} is created!`,
-        data: { email: user.email, role: user.role },
+        message: `User with role ${newUser.role} is created!`,
+        data: { email: newUser.email, role: newUser.role },
       });
     } else {
       return res.status(400).json({ message: "Invalid role user" });
