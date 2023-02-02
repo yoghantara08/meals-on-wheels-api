@@ -10,7 +10,7 @@ const Partner = require("../models/partner.model");
  * @param {express.NextFunction} next
  *
  */
-exports.partner = (req, res, next) => {
+exports.partner = async (req, res, next) => {
   // Catch errors from validation before saving data to database
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -25,21 +25,30 @@ exports.partner = (req, res, next) => {
   const phoneNumber = req.body.phoneNumber;
   const imageUrl = req.file.path.replace("\\", "/");
 
-  // CREATE NEW PARTNER
-  const partner = new Partner({
-    email: email,
-    password: password,
-    companyName: companyName,
-    address: address,
-    phoneNumber: phoneNumber,
-    imageUrl: imageUrl,
-    role: "PARTNER",
-    accountStatus: "PENDING",
-  });
+  try {
+    // Hash Password
+    const hashedPw = await bcrypt.hash(password, 12);
 
-  partner.save();
-  return res.status(201).json({
-    message: "Partner registered successfully!",
-    data: { email: partner.email, companyName: partner.companyName },
-  });
+    // CREATE NEW PARTNER
+    const partner = new Partner({
+      email: email,
+      password: hashedPw,
+      companyName: companyName,
+      address: address,
+      phoneNumber: phoneNumber,
+      imageUrl: imageUrl,
+      role: "PARTNER",
+      accountStatus: "PENDING",
+    });
+
+    const newPartner = await partner.save();
+    return res.status(201).json({
+      message: "Partner registered successfully!",
+      data: { email: newPartner.email, companyName: newPartner.companyName },
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ error: error, message: "Internal server error" });
+  }
 };
