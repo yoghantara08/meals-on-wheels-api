@@ -1,17 +1,37 @@
 const express = require("express");
 const router = express.Router();
 
+const riderController = require("../controller/rider.controller");
+
+const isAuth = require("../middleware/isAuth");
+const isRider = require("../middleware/isRider");
+
 /**
  * PATH: /api/rider
  */
 
-// GET all meals that being assigned
-router.get("/meals/pending");
+// GET all assigned order by admin
+router.get(
+  "/order/:riderId",
+  isAuth,
+  isRider,
+  riderController.getAssignedOrder
+);
 
-// PUT finish meal delivery
-router.get("/meal/finish-delivery");
+// PUT accept order and deliver meal
+router.put(
+  "/order/:riderId/:orderId",
+  isAuth,
+  isRider,
+  riderController.acceptOrder
+);
 
-// GET all finish delivered meals
-router.get("/meals");
+// PUT finish deliver meal
+router.put(
+  "/order-delivered/:riderId/:orderId",
+  isAuth,
+  isRider,
+  riderController.orderDelivered
+);
 
 module.exports = router;

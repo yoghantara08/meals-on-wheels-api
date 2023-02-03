@@ -6,6 +6,7 @@ const User = require("../models/users.model");
 const Partner = require("../models/partner.model");
 const Role = require("../utils/role");
 
+// MEMBER, RIDER, VOLUNTEER REGIS
 exports.register = async (req, res, next) => {
   // Catch errors from validation before saving data to database
   const errors = validationResult(req);
@@ -22,9 +23,10 @@ exports.register = async (req, res, next) => {
   const age = req.body.age;
   const address = req.body.address;
   const phoneNumber = req.body.phoneNumber;
-  const imageUrl = req.file.path.replace("\\", "/");
 
   try {
+    const image = req.file.path.replace("\\", "/");
+
     // HASH PASSWORD
     const hashedPw = await bcrypt.hash(password, 12);
 
@@ -38,7 +40,7 @@ exports.register = async (req, res, next) => {
       age: age,
       address: address,
       phoneNumber: phoneNumber,
-      imageUrl: imageUrl,
+      image: image,
       accountStatus: "PENDING",
     });
 
@@ -61,10 +63,11 @@ exports.register = async (req, res, next) => {
   } catch (error) {
     return res
       .status(500)
-      .json({ error: error, message: "Internal server error" });
+      .json({ message: error.message || "Internal server error!" });
   }
 };
 
+// PARTNER REGIS
 exports.regisPartner = async (req, res, next) => {
   // Catch errors from validation before saving data to database
   const errors = validationResult(req);
@@ -78,9 +81,10 @@ exports.regisPartner = async (req, res, next) => {
   const companyName = req.body.companyName;
   const address = req.body.address;
   const phoneNumber = req.body.phoneNumber;
-  const imageUrl = req.file.path.replace("\\", "/");
 
   try {
+    const image = req.file.path.replace("\\", "/");
+
     // Hash Password
     const hashedPw = await bcrypt.hash(password, 12);
 
@@ -91,7 +95,7 @@ exports.regisPartner = async (req, res, next) => {
       companyName: companyName,
       address: address,
       phoneNumber: phoneNumber,
-      imageUrl: imageUrl,
+      image: image,
       role: Role.Partner,
       accountStatus: "PENDING",
     });
@@ -104,6 +108,6 @@ exports.regisPartner = async (req, res, next) => {
   } catch (error) {
     return res
       .status(500)
-      .json({ error: error, message: "Internal server error" });
+      .json({ message: error.message || "Internal server error!" });
   }
 };
