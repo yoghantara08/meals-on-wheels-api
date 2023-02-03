@@ -1,17 +1,22 @@
 const express = require("express");
 const router = express.Router();
 
+const riderController = require("../controller/rider.controller");
+
 /**
  * PATH: /api/rider
  */
 
-// GET all meals that being assigned
-router.get("/meals/pending");
+// GET all assigned order by admin
+router.get("/order/:riderId", riderController.getAssignedOrder);
 
-// PUT finish meal delivery
-router.get("/meal/finish-delivery");
+// PUT accept order and deliver meal
+router.put("/order/:riderId/:orderId", riderController.acceptOrder);
 
-// GET all finish delivered meals
-router.get("/meals");
+// PUT finish deliver meal
+router.put(
+  "/order-delivered/:riderId/:orderId",
+  riderController.orderDelivered
+);
 
 module.exports = router;

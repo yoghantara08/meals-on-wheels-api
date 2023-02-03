@@ -58,5 +58,9 @@ router.put(
 );
 
 // PUT assigned meal to rider
+router.put(
+  "/assign-to-rider/:orderId/:riderId",
+  adminController.assignOrderToRider
+);
 
 module.exports = router;

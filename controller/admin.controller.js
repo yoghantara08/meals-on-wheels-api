@@ -5,9 +5,9 @@ const User = require("../models/users.model.js");
 const Partner = require("../models/partner.model");
 const Order = require("../models/order.model");
 const Meal = require("../models/meal.model");
-const Delivery = require("../models/delivery.model");
 
 const orderStatus = require("../utils/order-status");
+const Role = require("../utils/role");
 
 // USERS MANAGEMENT
 // GET all users (member/rider/volunteer)
@@ -266,12 +266,6 @@ exports.assignOrderToPartner = async (req, res, next) => {
       return res.status(400).json({ message: "Partner not found!" });
     }
 
-    if (partner.accountStatus === "PENDING") {
-      return res
-        .status(400)
-        .json({ message: "This account is not a partner yet!" });
-    }
-
     const order = await Order.findById(orderId);
 
     if (!order) {
@@ -294,7 +288,45 @@ exports.assignOrderToPartner = async (req, res, next) => {
 };
 
 // PUT assigned meal to rider
-/**
- * @param {express.Request} req
- * @param {express.Response} res
- */
+exports.assignOrderToRider = async (req, res, next) => {
+  const orderId = req.params.orderId;
+  const riderId = req.params.riderId;
+
+  try {
+    const rider = await User.findById(riderId);
+    if (!rider) {
+      return res.status(400).json({ message: "Rider not found!" });
+    }
+
+    // Check rider role
+    if (rider.role !== Role.Rider) {
+      return res.status(400).json({ message: "This user is not a rider" });
+    }
+
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res.status(400).json({ message: "Order not found!" });
+    }
+
+    // Check order status "READY TO DELIVERY"
+    if (order.orderStatus !== orderStatus.ReadyToDeliver) {
+      return res
+        .status(400)
+        .json({ message: "This order is not ready to deliver!" });
+    }
+
+    order.rider = rider._id;
+    order.orderStatus = orderStatus.AssignRider;
+
+    const newOrder = await order.save();
+
+    return res.status(200).json({
+      message: `Order assigned to rider ${rider.firstName}!`,
+      order: newOrder,
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: error.message || "Internal server error!" });
+  }
+};
