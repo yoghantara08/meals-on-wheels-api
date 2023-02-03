@@ -14,7 +14,6 @@ const memberRoutes = require("./routes/member.routes");
 const partnerRoutes = require("./routes/partner.routes");
 const profileRoutes = require("./routes/profile.routes");
 const riderRoutes = require("./routes/rider.routes");
-const volunteerRoutes = require("./routes/volunteer.routes");
 
 const upload = require("./utils/upload-image");
 
@@ -51,7 +50,6 @@ app.use("/api/member", memberRoutes);
 app.use("/api/partner", partnerRoutes);
 app.use("/api/profile", profileRoutes);
 app.use("/api/rider", riderRoutes);
-app.use("/api/volunteer", volunteerRoutes);
 
 mongoose.set("strictQuery", true);
 mongoose
