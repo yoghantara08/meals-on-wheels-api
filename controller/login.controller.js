@@ -17,6 +17,7 @@ exports.login = async (req, res, next) => {
 
   let loadedUser;
   let isCorrectPw;
+  let isActiveAccount;
 
   try {
     // Check account in both user and partner model
@@ -25,15 +26,25 @@ exports.login = async (req, res, next) => {
 
     if (user) {
       loadedUser = user;
+      isActiveAccount = user.accountStatus;
       isCorrectPw = await bcrypt.compare(password, user.password);
     } else if (partner) {
       loadedUser = partner;
+      isActiveAccount = partner.accountStatus;
       isCorrectPw = await bcrypt.compare(password, partner.password);
     }
 
     // Check if user not found
     if (!loadedUser) {
       return res.status(401).json({ message: "User can't be found!" });
+    }
+
+    // Check if active account
+    if (isActiveAccount !== "ACTIVE") {
+      return res.status(401).json({
+        message:
+          "Need admin permission to activate the account, please contact admin for account activation!",
+      });
     }
 
     // Check if password is incorrect
@@ -58,6 +69,6 @@ exports.login = async (req, res, next) => {
   } catch (error) {
     return res
       .status(500)
-      .json({ error: error, message: "Internal server error" });
+      .json({ message: error.message || "Internal server error!" });
   }
 };

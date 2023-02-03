@@ -1,16 +1,25 @@
 const express = require("express");
 const router = express.Router();
 
+// Controller
+const adminController = require("../controller/admin.controller");
+
+// Validation
+const mealValidation = require("../validation/addmealValidation");
+
 /**
  * PATH: /api/admin
  */
 
 // USERS MANAGEMENT
 // GET all users (member/rider/volunteer)
-router.get("/users");
+router.get("/users", adminController.getUsers);
 
 // GET rider/volunteer pending
-router.get("/accept-user");
+router.get("/users/pending", adminController.getPendingUsers);
+
+// PUT accept rider/volunteer
+router.put("/accept-user/:userId", adminController.acceptUserRegis);
 
 // PARTNERSHIP
 // GET all partners
@@ -24,7 +33,7 @@ router.get("/accept-partner");
 router.get("/meals");
 
 // POST meal menu
-router.post("/meal/add");
+router.post("/meal/add", mealValidation, adminController.addMeal);
 
 // PUT edit meal
 router.put("/meal/edit/:mealId");

@@ -26,7 +26,7 @@ const partnerSchema = new Schema({
     type: String,
     required: true,
   },
-  imageUrl: {
+  image: {
     type: String,
   },
   accountStatus: {

@@ -6,14 +6,17 @@ const mealSchema = new Schema({
     type: String,
     required: true,
   },
-  inggredients: [String],
-  imageUrl: {
+  ingredients: {
+    type: [String],
+    required: true,
+  },
+  image: {
     type: String,
     required: true,
   },
-  status: {
+  description: {
     type: String,
-    default: "AVAILABLE",
+    required: true,
   },
 });
 
