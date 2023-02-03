@@ -1,16 +1,8 @@
-const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const Partner = require("../models/partner.model");
 const User = require("../models/users.model");
 
-/**
- *
- * @param {express.Request} req
- * @param {express.Response} res
- * @param {express.NextFunction} next
- *
- */
 exports.login = async (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
