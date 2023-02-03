@@ -13,7 +13,7 @@ module.exports = (req, res, next) => {
   } catch (error) {
     return res
       .status(500)
-      .json({ error: error, message: "Internal Server error!" });
+      .json({ message: error.message || "Internal server error!" });
   }
 
   if (!decodedToken) {
