@@ -1,7 +1,10 @@
 const express = require("express");
+
 const User = require("../models/users.model");
 const Meal = require("../models/meal.model");
 const Order = require("../models/order.model");
+
+const orderStatus = require("../utils/order-status");
 
 // POST order meal :mealId
 exports.orderMeal = async (req, res, next) => {
@@ -27,8 +30,8 @@ exports.orderMeal = async (req, res, next) => {
 
     const order = new Order({
       orderStatus: "PENDING",
-      mealId: meal._id,
-      memberId: member._id,
+      meal: meal._id,
+      member: member._id,
     });
 
     const newOrder = await order.save();
@@ -59,9 +62,11 @@ exports.getMemberOrder = async (req, res, next) => {
 
     // Only on progress order displayed
     const order = await Order.find({
-      memberId: member._id,
-      orderStatus: { $ne: "DELIVERED" },
-    });
+      member: member._id,
+      orderStatus: { $ne: orderStatus.Complete },
+    })
+      .select("-__v")
+      .populate("meal", "-__v");
 
     return res.status(200).json(order);
   } catch (error) {
@@ -72,10 +77,6 @@ exports.getMemberOrder = async (req, res, next) => {
 };
 
 // GET all complete ordered meals status = "DELIVERED"
-/**
- * @param {express.Request} req
- * @param {express.Response} res
- */
 exports.getCompleteOrder = async (req, res, next) => {
   const memberId = req.params.memberId;
 
@@ -89,11 +90,13 @@ exports.getCompleteOrder = async (req, res, next) => {
         .json({ message: `Member with id:${memberId} not found!` });
     }
 
-    // Only on progress order displayed
+    // Only complete order displayed
     const order = await Order.find({
-      memberId: member._id,
-      orderStatus: "DELIVERED",
-    });
+      member: member._id,
+      orderStatus: orderStatus.Complete,
+    })
+      .select("-__v")
+      .populate("meal", "-__v");
 
     return res.status(200).json(order);
   } catch (error) {

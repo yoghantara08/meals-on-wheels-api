@@ -11,7 +11,7 @@ const mealValidation = require("../validation/addmealValidation");
  * PATH: /api/admin
  */
 
-// USERS MANAGEMENT
+// USERS MANAGEMENT ==================================
 // GET all users (member/rider/volunteer)
 router.get("/users", adminController.getUsers);
 
@@ -21,7 +21,7 @@ router.get("/users/pending", adminController.getPendingUsers);
 // PUT accept rider/volunteer
 router.put("/accept-user/:userId", adminController.acceptUserRegis);
 
-// PARTNERSHIP
+// PARTNERSHIP ==================================
 // GET all partners
 router.get("/partners", adminController.getPartners);
 
@@ -31,7 +31,7 @@ router.get("/partners/pending", adminController.getPendingPartners);
 // PUT accept partner
 router.put("/accept-partner/:partnerId", adminController.acceptPartnerRegis);
 
-// MEAL
+// MEAL ==================================
 // GET all meal
 router.get("/meals", adminController.getMeals);
 
@@ -44,26 +44,19 @@ router.put("/meal/edit/:mealId", adminController.editMeal);
 // DELETE meal
 router.delete("/meal/delete/:mealId", adminController.deleteMeal);
 
-// ORDER
-// GET all order pending
-router.get("/order/pending");
+// ORDER ==================================
+// GET all on progress order
+router.get("/order-on-progress", adminController.getOnProgressOrder);
 
-// PUT meal to partner
-router.put("/order/assign-partner");
+// GET all completed order
+router.get("/order-complete", adminController.getCompletedOrder);
 
-// GET all order prepared
-router.get("/order/prepared");
+// PUT assign order to partner
+router.put(
+  "/assign-to-partner/:orderId/:partnerId",
+  adminController.assignOrderToPartner
+);
 
-// GET all order ready to deliver
-router.get("/order/ready-to-deliver");
-
-// PUT meal to driver
-router.put("/order/assign-rider");
-
-// GET all order on delivery
-router.get("/order/on-delivery");
-
-// GET all order delivered/complete
-router.get("/order/complete");
+// PUT assigned meal to rider
 
 module.exports = router;

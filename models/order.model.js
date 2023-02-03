@@ -6,19 +6,19 @@ const orderSchema = new Schema({
     type: String,
     required: true,
   },
-  mealId: {
+  meal: {
     type: Schema.Types.ObjectId,
     ref: "Meal",
   },
-  memberId: {
+  member: {
     type: Schema.Types.ObjectId,
     ref: "User",
   },
-  partnerId: {
+  partner: {
     type: Schema.Types.ObjectId,
     ref: "Partner",
   },
-  riderId: {
+  rider: {
     type: Schema.Types.ObjectId,
     ref: "Rider",
   },

@@ -7,6 +7,8 @@ const Order = require("../models/order.model");
 const Meal = require("../models/meal.model");
 const Delivery = require("../models/delivery.model");
 
+const orderStatus = require("../utils/order-status");
+
 // USERS MANAGEMENT
 // GET all users (member/rider/volunteer)
 exports.getUsers = async (req, res, next) => {
@@ -212,16 +214,87 @@ exports.deleteMeal = async (req, res, next) => {
 };
 
 // ORDER
-// GET all order pending
+// GET all on progress order
+exports.getOnProgressOrder = async (req, res, next) => {
+  try {
+    const order = await Order.find({
+      orderStatus: { $ne: orderStatus.Complete },
+    })
+      .select("-__v")
+      .populate("meal", "-__v")
+      .populate("member", ["-password", "-__v"])
+      .populate("partner", ["-password", "-__v"])
+      .populate("rider", ["-password", "-__v"]);
 
-// PUT meal to partner
+    return res.status(200).json(order);
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: error.message || "Internal server error!" });
+  }
+};
 
-// GET all order prepared
+// GET all completed order
+exports.getCompletedOrder = async (req, res, next) => {
+  try {
+    const order = await Order.find({
+      orderStatus: orderStatus.Complete,
+    })
+      .select("-__v")
+      .populate("meal", "-__v")
+      .populate("member", ["-password", "-__v"])
+      .populate("partner", ["-password", "-__v"])
+      .populate("rider", ["-password", "-__v"]);
 
-// GET all order ready to deliver
+    return res.status(200).json(order);
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: error.message || "Internal server error!" });
+  }
+};
 
-// PUT meal to driver
+// PUT assign order to partner
+exports.assignOrderToPartner = async (req, res, next) => {
+  const partnerId = req.params.partnerId;
+  const orderId = req.params.orderId;
 
-// GET all order on delivery
+  try {
+    const partner = await Partner.findById(partnerId);
 
-// GET all order delivered/complete
+    if (!partner) {
+      return res.status(400).json({ message: "Partner not found!" });
+    }
+
+    if (partner.accountStatus === "PENDING") {
+      return res
+        .status(400)
+        .json({ message: "This account is not a partner yet!" });
+    }
+
+    const order = await Order.findById(orderId);
+
+    if (!order) {
+      return res.status(400).json({ message: "Order not found!" });
+    }
+
+    order.partner = partner._id;
+    order.orderStatus = orderStatus.AssignPartner;
+    const newOrder = await order.save();
+
+    return res.status(200).json({
+      message: `Order assigned to partner ${partner.companyName}!`,
+      order: newOrder,
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: error.message || "Internal server error!" });
+  }
+};
+
+// PUT assigned meal to rider
+/**
+ * @param {express.Request} req
+ * @param {express.Response} res
+ */
