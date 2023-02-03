@@ -23,20 +23,26 @@ router.put("/accept-user/:userId", adminController.acceptUserRegis);
 
 // PARTNERSHIP
 // GET all partners
-router.get("/partners");
+router.get("/partners", adminController.getPartners);
 
 // GET partners pending
-router.get("/accept-partner");
+router.get("/partners/pending", adminController.getPendingPartners);
+
+// PUT accept partner
+router.put("/accept-partner/:partnerId", adminController.acceptPartnerRegis);
 
 // MEAL
 // GET all meal
-router.get("/meals");
+router.get("/meals", adminController.getMeals);
 
 // POST meal menu
 router.post("/meal/add", mealValidation, adminController.addMeal);
 
 // PUT edit meal
-router.put("/meal/edit/:mealId");
+router.put("/meal/edit/:mealId", adminController.editMeal);
+
+// DELETE meal
+router.delete("/meal/delete/:mealId", adminController.deleteMeal);
 
 // ORDER
 // GET all order pending
