@@ -25,7 +25,13 @@ exports.register = async (req, res, next) => {
   const phoneNumber = req.body.phoneNumber;
 
   try {
-    const image = req.file.path.replace("\\", "/");
+    const file = req.file;
+    let image;
+    if (file) {
+      image = file.path.replace("\\", "/");
+    } else {
+      image = null;
+    }
 
     // HASH PASSWORD
     const hashedPw = await bcrypt.hash(password, 12);
@@ -83,7 +89,13 @@ exports.regisPartner = async (req, res, next) => {
   const phoneNumber = req.body.phoneNumber;
 
   try {
-    const image = req.file.path.replace("\\", "/");
+    const file = req.file;
+    let image;
+    if (file) {
+      image = file.path.replace("\\", "/");
+    } else {
+      image = null;
+    }
 
     // Hash Password
     const hashedPw = await bcrypt.hash(password, 12);
