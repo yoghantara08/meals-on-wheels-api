@@ -8,11 +8,7 @@ const mealValidation = [
     .notEmpty()
     .withMessage("Description is required!"),
 
-  check("ingredients")
-    .isArray()
-    .withMessage("Ingredients must be an array of string!")
-    .notEmpty()
-    .withMessage("Ingredients is required!"),
+  check("ingredients").notEmpty().withMessage("Ingredients is required!"),
 ];
 
 module.exports = mealValidation;
