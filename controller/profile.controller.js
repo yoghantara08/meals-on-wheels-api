@@ -31,7 +31,7 @@ exports.getUserDetail = async (req, res, next) => {
       return res.status(400).json("User not found!");
     }
 
-    return res.status(200).json({ user: loadedUser });
+    return res.status(200).json(loadedUser);
   } catch (error) {
     return res
       .status(500)

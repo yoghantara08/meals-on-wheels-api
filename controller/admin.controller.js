@@ -222,9 +222,9 @@ exports.getOnProgressOrder = async (req, res, next) => {
     })
       .select("-__v")
       .populate("meal", "-__v")
-      .populate("member", ["-password", "-__v"])
-      .populate("partner", ["-password", "-__v"])
-      .populate("rider", ["-password", "-__v"]);
+      .populate("member", ["-password", "-__v"], "User")
+      .populate("partner", ["-password", "-__v"], "Partner")
+      .populate("rider", ["-password", "-__v"], "User");
 
     return res.status(200).json(order);
   } catch (error) {
@@ -242,9 +242,9 @@ exports.getCompletedOrder = async (req, res, next) => {
     })
       .select("-__v")
       .populate("meal", "-__v")
-      .populate("member", ["-password", "-__v"])
-      .populate("partner", ["-password", "-__v"])
-      .populate("rider", ["-password", "-__v"]);
+      .populate("member", ["-password", "-__v"], "User")
+      .populate("partner", ["-password", "-__v"], "Partner")
+      .populate("rider", ["-password", "-__v"], "User");
 
     return res.status(200).json(order);
   } catch (error) {
