@@ -13,7 +13,10 @@ const Role = require("../utils/role");
 // GET all users (member/rider/volunteer)
 exports.getUsers = async (req, res, next) => {
   try {
-    const users = await User.find({ accountStatus: "ACTIVE" });
+    const users = await User.find({ accountStatus: "ACTIVE" }).select([
+      "-__v",
+      "-password",
+    ]);
     return res.status(200).json(users);
   } catch (error) {
     return res
@@ -25,7 +28,10 @@ exports.getUsers = async (req, res, next) => {
 // GET rider/volunteer pending
 exports.getPendingUsers = async (req, res, next) => {
   try {
-    const users = await User.find({ accountStatus: "PENDING" });
+    const users = await User.find({ accountStatus: "PENDING" }).select([
+      "-__v",
+      "-password",
+    ]);
     return res.status(200).json(users);
   } catch (error) {
     return res
@@ -133,7 +139,13 @@ exports.addMeal = async (req, res, next) => {
     const mealName = req.body.mealName;
     const ingredients = req.body.ingredients;
     const description = req.body.description;
-    const image = req.file.path.replace("\\", "/");
+    const file = req.file;
+    let image;
+    if (file) {
+      image = file.path.replace("\\", "/");
+    } else {
+      return res.status(400).json({ message: "Image is required!" });
+    }
 
     const meal = new Meal({
       mealName: mealName,
@@ -270,6 +282,13 @@ exports.assignOrderToPartner = async (req, res, next) => {
 
     if (!order) {
       return res.status(400).json({ message: "Order not found!" });
+    }
+
+    if (order.orderStatus !== orderStatus.Pending) {
+      return res.status(400).json({
+        message:
+          "Error accepting order, the order status is not for assigned to partner",
+      });
     }
 
     order.partner = partner._id;

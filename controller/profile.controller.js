@@ -1,13 +1,7 @@
-const express = require("express");
 const User = require("../models/users.model");
 const Partner = require("../models/partner.model");
 const jwt = require("jsonwebtoken");
 
-/**
- * @param {express.Request} req
- * @param {express.Response} res
- * @param {express.NextFunction} next
- */
 exports.getUserDetail = async (req, res, next) => {
   const token = req.get("Authorization").split(" ")[1];
   const payload = jwt.decode(token);

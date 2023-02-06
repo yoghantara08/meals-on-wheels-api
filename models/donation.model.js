@@ -8,7 +8,6 @@ const donationSchema = new Schema({
   },
   lastName: {
     type: String,
-    required: true,
   },
   email: {
     type: String,
@@ -24,7 +23,6 @@ const donationSchema = new Schema({
   },
   message: {
     type: String,
-    required: true,
   },
 });
 

@@ -20,7 +20,7 @@ const orderSchema = new Schema({
   },
   rider: {
     type: Schema.Types.ObjectId,
-    ref: "Rider",
+    ref: "User",
   },
 });
 
