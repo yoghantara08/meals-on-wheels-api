@@ -15,7 +15,9 @@ exports.getAssignedOrder = async (req, res, next) => {
 
     const order = await Order.find({
       rider: riderId,
-      orderStatus: orderStatus.AssignRider,
+      orderStatus: {
+        $in: [orderStatus.AssignRider, orderStatus.OnDelivery],
+      },
     })
       .select("-__v")
       .populate("meal", "-__v")
